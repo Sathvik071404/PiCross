@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Picross Solver</title>
+    <meta
+      name="description"
+      content="A client-side Picross solver built as an interactive GitHub portfolio project."
+    />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#solver" aria-label="Picross Solver home">
+        <span class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span>
+          <strong>Picross Solver</strong>
+          <small>constraint logic demo</small>
+        </span>
+      </a>
+      <nav aria-label="Page">
+        <a href="#solver">Solver</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#source">Source</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">
+          Dark
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="solver" class="solver-shell" aria-labelledby="solver-title">
+        <div class="workspace">
+          <section class="tool-panel controls-panel" aria-labelledby="solver-title">
+            <div class="panel-heading">
+              <p class="eyebrow">Portfolio Project</p>
+              <h1 id="solver-title">Interactive Picross Solver</h1>
+            </div>
+
+            <div class="control-block">
+              <label>Puzzle size</label>
+              <div class="builder-size">
+                <div class="control-block">
+                  <label for="builder-rows">Rows</label>
+                  <input
+                    id="builder-rows"
+                    type="number"
+                    min="5"
+                    max="15"
+                    step="1"
+                    value="10"
+                    inputmode="numeric"
+                  />
+                </div>
+                <div class="control-block">
+                  <label for="builder-columns">Columns</label>
+                  <input
+                    id="builder-columns"
+                    type="number"
+                    min="5"
+                    max="15"
+                    step="1"
+                    value="10"
+                    inputmode="numeric"
+                  />
+                </div>
+                <button id="new-drawing" type="button">Apply</button>
+              </div>
+            </div>
+
+            <div class="control-block">
+              <label>Input mode</label>
+              <div class="segmented-control" role="tablist" aria-label="Input mode">
+                <button
+                  id="clue-mode-button"
+                  class="active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="clue-mode-panel"
+                >
+                  Clues
+                </button>
+                <button
+                  id="draw-mode-button"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="draw-mode-panel"
+                >
+                  Draw
+                </button>
+              </div>
+            </div>
+
+            <div id="clue-mode-panel" class="mode-panel" role="tabpanel" aria-labelledby="clue-mode-button">
+              <div class="clue-editors">
+                <div class="control-block">
+                  <label for="row-clues">Row clues</label>
+                  <textarea id="row-clues" spellcheck="false" placeholder="3 1&#10;1 1&#10;5"></textarea>
+                </div>
+                <div class="control-block">
+                  <label for="column-clues">Column clues</label>
+                  <textarea id="column-clues" spellcheck="false" placeholder="1&#10;3&#10;5"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div
+              id="draw-mode-panel"
+              class="mode-panel hidden"
+              role="tabpanel"
+              aria-labelledby="draw-mode-button"
+            >
+              <div class="draw-toolbar" aria-label="Drawing tools">
+                <button id="draw-fill" class="active" type="button" aria-pressed="true">Fill</button>
+                <button id="draw-erase" type="button" aria-pressed="false">Erase</button>
+                <button id="clear-drawing" type="button">Clear</button>
+              </div>
+
+              <button id="use-drawing" class="primary-action full-width" type="button">
+                Use Drawing
+              </button>
+            </div>
+
+            <div class="button-row">
+              <button id="solve-button" class="primary-action" type="button">Solve</button>
+              <button id="reset-button" type="button">Reset</button>
+            </div>
+
+            <div id="message" class="message" role="status" aria-live="polite">
+              Ready.
+            </div>
+          </section>
+
+          <section class="stage-panel" aria-label="Picross board">
+            <div class="stats-strip" aria-label="Solver statistics">
+              <div>
+                <span>Size</span>
+                <strong id="size-stat">-</strong>
+              </div>
+              <div>
+                <span>Filled</span>
+                <strong id="filled-stat">-</strong>
+              </div>
+              <div>
+                <span>Passes</span>
+                <strong id="pass-stat">-</strong>
+              </div>
+              <div>
+                <span>Branches</span>
+                <strong id="branch-stat">-</strong>
+              </div>
+            </div>
+
+            <div class="stage-body">
+              <div id="draw-stage" class="draw-stage">
+                <div
+                  id="builder-grid"
+                  class="builder-grid"
+                  aria-label="Puzzle drawing grid"
+                ></div>
+              </div>
+
+              <div id="solution-stage" class="solution-stage hidden">
+                <div id="puzzle-frame" class="puzzle-frame">
+                  <div class="corner-cell" aria-hidden="true"></div>
+                  <div id="column-rail" class="column-rail"></div>
+                  <div id="row-rail" class="row-rail"></div>
+                  <div id="board-grid" class="board-grid"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="tool-panel results-panel" aria-labelledby="result-title">
+            <div class="panel-heading compact">
+              <p class="eyebrow">Solver State</p>
+              <h2 id="result-title">Trace</h2>
+            </div>
+            <ol id="trace-list" class="trace-list"></ol>
+          </aside>
+        </div>
+      </section>
+
+      <section id="architecture" class="content-band" aria-labelledby="architecture-title">
+        <div class="content-grid">
+          <div>
+            <p class="eyebrow">Implementation</p>
+            <h2 id="architecture-title">A solver that earns its pixels</h2>
+          </div>
+          <div class="proof-grid">
+            <article>
+              <h3>Line Candidates</h3>
+              <p>Each clue line becomes the complete set of valid binary patterns for its row or column.</p>
+            </article>
+            <article>
+              <h3>Constraint Passes</h3>
+              <p>Rows and columns filter each other until every forced cell has been committed.</p>
+            </article>
+            <article>
+              <h3>Bounded Search</h3>
+              <p>When deduction stalls, the solver chooses the most constrained unknown cell and backtracks.</p>
+            </article>
+            <article>
+              <h3>Static Deployment</h3>
+              <p>The project runs in the browser with plain HTML, CSS, and JavaScript for simple GitHub Pages hosting.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="source" class="source-band" aria-labelledby="source-title">
+        <div>
+          <p class="eyebrow">GitHub Resume</p>
+          <h2 id="source-title">What this shows</h2>
+        </div>
+        <p>
+          This project presents algorithm design, interface polish, input validation, responsive layout,
+          and client-side state management in one compact demo.
+        </p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

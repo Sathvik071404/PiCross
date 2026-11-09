@@ -1,0 +1,9 @@
+{
+  "name": "Picross Solver",
+  "short_name": "Picross",
+  "description": "A browser-based Picross puzzle solver.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f8f9",
+  "theme_color": "#0f766e"
+}
