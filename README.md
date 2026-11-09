@@ -28,8 +28,6 @@ flowchart LR
   WORKER --> BOARD[Solution board and trace]
 ```
 
-The extracted code graph is available in [`graphify-out/graph.json`](graphify-out/graph.json). It contains the function and call relationships identified by Graphify.
-
 ## Deploy
 
 The project is static and can be hosted with GitHub Pages. Select the repository root as the Pages source.
